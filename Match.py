@@ -4,6 +4,8 @@ import sqlite3
 # Create the root window
 root = tk.Tk()
 
+global name_entry, form, age_entry
+
 # Create a label with text
 label = tk.Label(root, text="Purrfect Match")
 
@@ -25,8 +27,6 @@ if not table_exists:
 # Define a function that should be called when the button is clicked
 def on_button_click():
     # This function creates and displays the survey form
-
-    global name_entry, form, age_entry
     
     # Create the form window
     form = tk.Toplevel(root)
