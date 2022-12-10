@@ -4,13 +4,13 @@ import sqlite3
 # Create the root window
 root = tk.Tk()
 
-global name_entry, form, age_entry
-
 # Create a label with text
 label = tk.Label(root, text="Purrfect Match")
 
 # Place the label in the root window
 label.pack()
+
+global name_entry, form, age_entry
 
 # Create a database connection
 connection = sqlite3.connect("survey.db")
@@ -27,6 +27,8 @@ if not table_exists:
 # Define a function that should be called when the button is clicked
 def on_button_click():
     # This function creates and displays the survey form
+
+    global name_entry, form, age_entry
     
     # Create the form window
     form = tk.Toplevel(root)
@@ -55,6 +57,8 @@ def on_button_click():
 
 def on_submit(event):
     # This function handles the form data when the submit button is clicked
+
+    global name_entry, form, age_entry
     
     # Get the data from the form fields
     name = name_entry.get()
@@ -82,6 +86,8 @@ listbox = tk.Listbox(root)
 # Query the database and update the Listbox widget
 def update_listbox():
 
+    global name_entry, form, age_entry
+
     # Clear the Listbox widget
     listbox.delete(0, tk.END)
 
@@ -104,6 +110,72 @@ update_listbox()
 
 # Place the Listbox widget in the root window
 listbox.pack()
+
+def on_edit_click(event):
+    # This function handles the editing of records
+
+    global name_entry, form, age_entry
+
+    # Get the selected item in the Listbox widget
+    index = listbox.curselection()
+    item = listbox.get(index)
+
+    # Get the values for the selected record
+    name = item[0]
+    age = item[1]
+
+    # Create the form window
+    form = tk.Toplevel(root)
+
+    # Create form fields
+    name_label = tk.Label(form, text="Name:")
+    name_entry = tk.Entry(form, text=name)
+    age_label = tk.Label(form, text="Age:")
+    age_entry = tk.Entry(form, text=age)
+
+    # Create a submit button
+    submit_button = tk.Button(form, text="Submit")
+
+    # Place the form fields and button in the form window
+    name_label.grid(row=0, column=0)
+    name_entry.grid(row=0, column=1)
+    age_label.grid(row=1, column=0, pady=(10, 0))
+    age_entry.grid(row=1, column=1)
+    submit_button.grid(row=2, column=0, columnspan=2, pady=(10, 0))
+
+    # Bind the submit button to a function that handles the form data
+    submit_button.bind("<Button-1>", on_edit_submit)
+
+    # Show the form
+    form.mainloop()
+
+def on_edit_submit(event):
+    # This function handles the form data when the submit button is clicked
+
+    global name_entry, form, age_entry
+
+    # Get the data from the form fields
+    name = name_entry.get()
+    age = age_entry.get()
+
+    # Update the database with the new values
+    cursor.execute("UPDATE survey SET name = ?, age = ? WHERE name = ?", (name, age, name))
+    connection.commit()
+
+    # Close the form window
+    form.destroy()
+
+    # Update the Listbox widget
+    update_listbox()
+
+# Create an edit button
+edit_button = tk.Button(root, text="Edit")
+
+# Bind the edit button to a function that handles the editing of records
+edit_button.bind("<Button-1>", on_edit_click)
+
+# Place the edit button below the add button
+edit_button.pack()
 
 # Run the main loop
 root.mainloop()
