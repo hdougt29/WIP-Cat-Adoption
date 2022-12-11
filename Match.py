@@ -1,14 +1,18 @@
 import tkinter as tk
 import sqlite3
+from tkinter  import messagebox
 
 # Create the root window
 root = tk.Tk()
 
+# Set the size of the root window to 600x400
+root.geometry("600x500")
+
 # Create a label with text
-label = tk.Label(root, text="Purrfect Match")
+title_label = tk.Label(root, text="Purrfect Match", font=("Helvetica", 24), bg="Dark orange")
 
 # Place the label in the root window
-label.pack()
+title_label.pack()
 
 global name_entry, form, age_entry
 
@@ -74,14 +78,14 @@ def on_submit(event):
     # Update the Listbox widget
     update_listbox()
 
-# Create a button with text
-button = tk.Button(root, text="Add cat", command=on_button_click)
+# Create an add button with text
+add_button = tk.Button(root, text="Add Animal", command=on_button_click, font=("Helvetica", 18))
 
 # Place the button below the label
-button.pack()
+add_button.pack()
 
 # Create a Listbox widget in the root window
-listbox = tk.Listbox(root)
+listbox = tk.Listbox(root, font=("Helvetica", 18))
 
 # Query the database and update the Listbox widget
 def update_listbox():
@@ -104,6 +108,9 @@ def update_listbox():
     # Loop through the rows of data and add each row to the Listbox widget
     for row in rows:
         listbox.insert(tk.END, row)
+
+    # Select the first item in the Listbox widget
+    listbox.select_set(2)
 
 # Call the update_listbox function to populate the Listbox widget with data
 update_listbox()
@@ -129,9 +136,11 @@ def on_edit_click(event):
 
     # Create form fields
     name_label = tk.Label(form, text="Name:")
-    name_entry = tk.Entry(form, text=name)
+    name_entry = tk.Entry(form)
+    name_entry.insert(0, name)
     age_label = tk.Label(form, text="Age:")
-    age_entry = tk.Entry(form, text=age)
+    age_entry = tk.Entry(form)
+    age_entry.insert(0, age)
 
     # Create a submit button
     submit_button = tk.Button(form, text="Submit")
@@ -169,7 +178,7 @@ def on_edit_submit(event):
     update_listbox()
 
 # Create an edit button
-edit_button = tk.Button(root, text="Edit")
+edit_button = tk.Button(root, text="Edit Animal", font=("Helvetica", 20))
 
 # Bind the edit button to a function that handles the editing of records
 edit_button.bind("<Button-1>", on_edit_click)
@@ -177,5 +186,34 @@ edit_button.bind("<Button-1>", on_edit_click)
 # Place the edit button below the add button
 edit_button.pack()
 
+# Define a function that should be called when the "Delete" button is clicked
+def on_delete_click():
+    # This function handles the deletion of records
+
+    # Get the selected item in the Listbox widget
+    index = listbox.curselection()
+    item = listbox.get(index)
+
+    # Get the values for the selected record
+    name, age = item
+
+    # Ask the user for confirmation before deleting the record
+    result = messagebox.askyesno("Confirm", "Are you sure you want to delete this record?")
+
+    if result == True:
+        # Delete the record from the database
+        cursor.execute("DELETE FROM survey WHERE name = ? AND age = ?", (name, age))
+        connection.commit()
+
+        # Update the Listbox widget
+        update_listbox()
+
+# Create a button with text
+delete_button = tk.Button(root, text="Delete Animal", command=on_delete_click, font=("Helvetica", 18) )
+
+# Place the button below the label
+delete_button.pack()
+
 # Run the main loop
 root.mainloop()
+
